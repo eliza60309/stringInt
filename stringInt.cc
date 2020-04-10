@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include "stringInt.h"
 
 stringInt::stringInt()
@@ -7,7 +8,34 @@ stringInt::stringInt()
 	(*this).ptr[0] = '0';
 }
 
+stringInt::stringInt(stringInt &num)
+{
+	(*this).setArray(num.ptr);
+}
+
 stringInt::stringInt(const char *c)
+{
+	(*this).setArray(c);
+}
+
+stringInt::~stringInt()
+{
+	std::free((*this).ptr);
+}
+
+stringInt &stringInt::operator=(stringInt &num)
+{
+	(*this).setArray(num.ptr);
+	return (*this);
+}
+
+stringInt &stringInt::operator=(const char *c)
+{
+	(*this).setArray(c);
+	return (*this);
+}
+
+void stringInt::setArray(const char *c)
 {
 	(*this).size = 0;
 	int string_size = 0;
@@ -47,11 +75,6 @@ stringInt::stringInt(const char *c)
 	}
 }
 
-stringInt::~stringInt()
-{
-	std::free((*this).ptr);
-}
-
 std::ostream& operator<<(std::ostream &out, stringInt &num)
 {
 	for(int i = 0; i < num.size; i++)
@@ -59,4 +82,17 @@ std::ostream& operator<<(std::ostream &out, stringInt &num)
 		out << num.ptr[num.size - i - 1];
 	}
 	return out;
+}
+
+std::istream& operator>>(std::istream &in, stringInt &num)
+{
+	std::string s;
+	in >> s;
+	num = s.c_str();
+	return in;
+}
+
+const char *stringInt::getArray()
+{
+	return (*this).ptr;
 }

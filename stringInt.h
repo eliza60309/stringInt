@@ -10,10 +10,18 @@ class stringInt
 	public:
 	//functions
 	stringInt();
+	stringInt(stringInt &);
 	stringInt(const char *);
 	~stringInt();
-	friend std::ostream& operator<<(std::ostream &out, stringInt &num);
+	stringInt &operator=(stringInt &);
+	stringInt &operator=(const char *);
+
+	private:
+	void setArray(const char *);
+
+	friend std::ostream& operator<<(std::ostream &, stringInt &);
+	friend std::istream& operator>>(std::ostream &, stringInt &);
 };
 
-std::ostream& operator<<(std::ostream &out, stringInt &num);
-
+std::ostream& operator<<(std::ostream &, stringInt &);
+std::istream& operator>>(std::istream &, stringInt &);

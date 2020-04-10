@@ -12,8 +12,8 @@ int main()
 		cin >> s;
 		if(s == "print")
 		{
-			cin >> s;
-			stringInt si(s.c_str());
+			stringInt si;
+			cin >> si;
 			cout << si << endl;
 		}
 	}
