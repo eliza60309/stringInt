@@ -1,21 +1,27 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <cctype>
 #include "stringInt.h"
 
 stringInt::stringInt()
 {
-	(*this).ptr = (char *)std::malloc(1);
+	(*this).ptr = (char *)std::malloc(2);
 	(*this).ptr[0] = '0';
+	(*this).ptr[1] = '\0';
+	(*this).sign = false;
 }
 
-stringInt::stringInt(stringInt &num)
+stringInt::stringInt(const stringInt &num)
 {
 	(*this).setArray(num.ptr);
+	(*this).sign = num.sign;
 }
 
 stringInt::stringInt(const char *c)
 {
 	(*this).setArray(c);
+
 }
 
 stringInt::~stringInt()
@@ -23,63 +29,53 @@ stringInt::~stringInt()
 	std::free((*this).ptr);
 }
 
-stringInt &stringInt::operator=(stringInt &num)
+stringInt &stringInt::operator=(const stringInt &num)
 {
 	(*this).setArray(num.ptr);
-	return (*this);
+	return *this;
 }
 
 stringInt &stringInt::operator=(const char *c)
 {
 	(*this).setArray(c);
-	return (*this);
+	return *this;
 }
 
 void stringInt::setArray(const char *c)
 {
-	(*this).size = 0;
-	int string_size = 0;
-	bool lead_zero = true;
-	int last_lead_zero = -1;
+	bool lead_zero = true, number = false;
+	std::vector<char> v;
+	(*this).sign = false;
 	for(int i = 0; c[i] != '\0'; i++)
 	{
-		string_size++;
 		if(c[i] >= '0' && c[i] <= '9')
 		{
-			if(!lead_zero)(*this).size++;
+			number = true;
+			if(!lead_zero)v.push_back(c[i]);
 			else if(c[i] > '0')
 			{
 				lead_zero = false;
-				(*this).size++;
+				v.push_back(c[i]);
 			}
-			else last_lead_zero = i;
 		}
-		else
-		{
-			break;
-		}
+		else if(!number && c[i] == '-')(*this).sign = true;
+		else break;
 	}
-	if(lead_zero)
-	{
-		(*this).size = 1;
-	}
-	(*this).ptr = (char *)std::malloc((*this).size);
+	if(v.empty())v.push_back('0');
+	(*this).ptr = (char *)std::malloc(v.size() + 1);
 	*(*this).ptr = '0';
-	for(int i = 0, j = string_size - 1; j != last_lead_zero; j--)
-	{
-		if(c[i] >= '0' && c[i] <= '9')
-		{
-			(*this).ptr[i] = c[j];
-			i++;
-		}
-	}
+	for(int i = 0; i < v.size(); i++)
+		(*this).ptr[i] = v[v.size() - i - 1];
+	(*this).ptr[v.size()] = '\0'; 
 }
 
-std::ostream& operator<<(std::ostream &out, stringInt &num)
+std::ostream& operator<<(std::ostream &out, const stringInt &num)
 {
-	for(int i = 0; i < num.size; i++)
+	int size = 0;
+	for(int i = 0; num.ptr[i] != '\0'; i++)size++;
+	for(int i = 0; i < size; i++)
 	{
-		out << num.ptr[num.size - i - 1];
+		out << num.ptr[size - i - 1];
 	}
 	return out;
 }
@@ -87,12 +83,23 @@ std::ostream& operator<<(std::ostream &out, stringInt &num)
 std::istream& operator>>(std::istream &in, stringInt &num)
 {
 	std::string s;
-	in >> s;
+	char c;
+	if(!in.eof() && in.peek() == '-')
+	{
+		in >> c;
+		s.push_back(c);
+	}
+	while(!in.eof())
+	{
+		in >> c;
+		if(in.fail())break;
+		if(std::isdigit(c))s.push_back(c);
+		else
+		{
+			in.putback(c);
+			break;
+		}
+	}
 	num = s.c_str();
 	return in;
-}
-
-const char *stringInt::getArray()
-{
-	return (*this).ptr;
 }
