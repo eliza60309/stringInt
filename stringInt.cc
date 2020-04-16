@@ -72,6 +72,7 @@ void stringInt::setArray(const char *c)
 std::ostream& operator<<(std::ostream &out, const stringInt &num)
 {
 	int size = 0;
+	if(num.sign)out << "-";
 	for(int i = 0; num.ptr[i] != '\0'; i++)size++;
 	for(int i = 0; i < size; i++)
 	{
@@ -84,13 +85,18 @@ std::istream& operator>>(std::istream &in, stringInt &num)
 {
 	std::string s;
 	char c;
-	if(!in.eof() && in.peek() == '-')
+	if(!in.eof())
 	{
 		in >> c;
-		s.push_back(c);
+		if(in.good())
+		{
+			if(c == '-')s.push_back(c);
+			else in.putback(c);
+		}
 	}
 	while(!in.eof())
 	{
+		if(in.peek() == '\n')break;
 		in >> c;
 		if(in.fail())break;
 		if(std::isdigit(c))s.push_back(c);
