@@ -41,6 +41,12 @@ stringInt &stringInt::operator=(const char *c)
 	return *this;
 }
 
+/*stringInt &stringInt::operator+(const stringInt &num)
+{
+	if(num.sign == (*this).sign)return (*this).add(num);
+	else return (*this).sub(num);
+}*/
+
 void stringInt::setArray(const char *c)
 {
 	bool lead_zero = true, number = false;
@@ -67,6 +73,30 @@ void stringInt::setArray(const char *c)
 	for(int i = 0; i < v.size(); i++)
 		(*this).ptr[i] = v[v.size() - i - 1];
 	(*this).ptr[v.size()] = '\0'; 
+}
+
+bool stringInt::greater(const stringInt &num)
+{
+	int size = 0;
+	for(int i = 0;; i++)
+	{
+		if((*this).ptr[i] == 0)
+		{
+			if(num.ptr[i] == 0)
+			{
+				size = i;
+				break;
+			}
+			else return false;
+		}
+		else if(num.ptr[i] == 0)return true;
+	}
+	for(int i = size; i >= 0; i--)
+	{
+		if((*this).ptr[i] > num.ptr[i])return true;
+		else if((*this).ptr[i] < num.ptr[i])return false;
+	}
+	return false;
 }
 
 std::ostream& operator<<(std::ostream &out, const stringInt &num)
@@ -96,6 +126,13 @@ std::istream& operator>>(std::istream &in, stringInt &num)
 	}
 	while(!in.eof())
 	{
+		if(std::isdigit(in.peek()))
+		{
+			in >> c;
+			s.push_back(c);
+		}
+		else break;
+	/*
 		if(in.peek() == '\n')break;
 		in >> c;
 		if(in.fail())break;
@@ -105,6 +142,7 @@ std::istream& operator>>(std::istream &in, stringInt &num)
 			in.putback(c);
 			break;
 		}
+	*/
 	}
 	num = s.c_str();
 	return in;
